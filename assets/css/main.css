@@ -46,7 +46,7 @@ body {
     border: 1px solid grey;
     cursor: pointer;
 }
-.cell[data-isalive="true"] {
+.cell[data-is-alive="true"] {
     background-color: black;
     border-color: black;
 }

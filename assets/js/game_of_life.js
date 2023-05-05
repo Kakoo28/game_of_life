@@ -8,10 +8,10 @@ let mouse_down = false;
 
 cells.forEach(cell => cell.addEventListener('mouseover', () => {
     if (mouse_down) {
-        if (cell.dataset.isalive === "true") {
-            cell.dataset.isalive = "false";
+        if (cell.dataset.isAlive === "true") {
+            cell.dataset.isAlive = "false";
         } else {
-            cell.dataset.isalive = "true";
+            cell.dataset.isAlive = "true";
         }
     }
 }));
