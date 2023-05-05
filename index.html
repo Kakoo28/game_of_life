@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Of Life</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+    <div id="game-of-life"></div>
+
+    <div id="overlay">
+        <button id="reset-btn" class="button">Reset</button>
+        <button id="start-stop-btn" class="button">Start</button>
+        <input type="range" min="0" max="100" value="20">
+
+        <button id="random-btn" class="button">Random</button>
+        <button id="hide-btn">Hide</button>
+    </div>
+    
+    <script src="assets/js/grid.js"></script>
+    <script src="assets/js/game_of_life.js"></script>
+</body>
+</html>
