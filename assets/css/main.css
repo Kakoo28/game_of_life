@@ -51,11 +51,12 @@ body {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
     background-color: rgba(255, 255, 255, 0.5);
     border-radius: 10px;
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
     padding: 20px;
+    text-align: center;
 }
 
 #overlay>div:first-child {
@@ -79,7 +80,6 @@ body {
     background-color: rgba(73, 145, 5, 0.8);
     cursor: pointer;
     transition: transform 0.2s ease-in-out;
-    margin-left: 10px;
 }
 
 #forward-btn>img {
@@ -90,6 +90,8 @@ body {
 #start-btn>img {
     width: 60%;
     height: 60;
+}
+#start-btn:not(.paused) img {
     margin-left: 5px;
 }
 
@@ -106,7 +108,6 @@ body {
     border-radius: 5px;
     outline: none;
     transition: opacity 0.2s;
-    margin-left: 7.5%;
 }
 
 #speed-range::-webkit-slider-thumb {
@@ -171,20 +172,6 @@ body {
     transform: scale(1.05);
     text-decoration: underline;
 }
-
-#zoom-btns {
-    position: fixed;
-    top: 2%;
-    right: 2%;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-}
-
-#zoom-btns .button {
-    background-color: rgba(73, 145, 5, 0.8);
-}
-
 
 @media screen and (max-width: 1000px) {
     #overlay {
