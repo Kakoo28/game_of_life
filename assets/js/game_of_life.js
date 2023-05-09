@@ -1,148 +1,120 @@
-// ELEMENTS DOM
+const GRID_CONTAINER = document.getElementById('container');
 
-const RESET_BTN = document.getElementById('reset-btn');
-const START_BTN = document.getElementById('start-pause-btn');
-const RANDOM_BTN = document.getElementById('random-btn');
-const FORWARD_BTN = document.getElementById('forward-btn');
-const SPEED_RANGE = document.getElementById('speed-range');
+const ROWS = Math.floor(window.innerHeight / 20);
+const COLS = Math.floor(window.innerWidth / 20);
 
-// VARIABLES GLOBALS
+let GRID = new Array(ROWS);
+let NEXT_GRID = new Array(ROWS);
 
-let mouse_down = false;
+
 let is_running = false;
-let generation_count = 0;
+let mouse_down = false;
 
-// FONCTIONS
+let game_interval;
+let interval_time = 100;
 
-function getCell(x, y) { // RECUPERER UNE CELL AVEC SES COORDONNEES
-    return document.querySelector(`.cell[data-x="${x}"][data-y="${y}"]`);
+function init() {
+    drawGrid();
+    initGrids();
+    resetGrids();
+    setupControls();
 }
 
-function reset() { // FONCTION RESET GRID ET VARIABLES GLOBALS
-    document.querySelectorAll('.cell[data-is-alive="true"]').forEach(cell => cell.dataset.isAlive = "false");
 
-    if (is_running) {
-        START_BTN.querySelector('img').src = "./assets/icons/play-icon.svg";
-        START_BTN.classList.remove('paused');
-        is_running = false;
+// GRID FUNCTIONS 
+
+function drawGrid() {
+    const table = document.createElement("table");
+    table.id = "game-of-life";
+
+    for (let row = 0; row < ROWS; row++) {
+        const tr = document.createElement("tr");
+        for (let col = 0; col < COLS; col++) {
+            const cell = document.createElement("td");
+            cell.classList.add('cell');
+            cell.setAttribute("id", row + "_" + col);
+            cell.setAttribute("status", "dead");
+
+            cell.addEventListener('mouseover', cellMouseHoverHandler);
+            tr.appendChild(cell);
+        }
+        table.appendChild(tr);
     }
-
-    mouse_down = false;
+    GRID_CONTAINER.appendChild(table);
 }
 
-function startButton() { // FONCTION BOUTON START_PAUSE CLIQUER
-    const icon = START_BTN.querySelector('img');
-    if (is_running) {
-        icon.src = "./assets/icons/play-icon.svg";
-        START_BTN.classList.remove('paused');
-        is_running = false;
-    } else {
-        icon.src = "./assets/icons/pause-icon.svg";
-        START_BTN.classList.add('paused');
-        is_running = true;
+function initGrids() {
+    for (let row = 0; row < ROWS; row++) {
+        GRID[row] = new Array(COLS);
+        NEXT_GRID[row] = new Array(COLS);
     }
 }
 
-function randomGen() { // GENERATION RANDOM OPTIMISEE
-    // CREATION D'UN TABLEAU GRID_SIZE_X * GRID_SIZE_Y (200x200) QUI CONTIENT POUR CHAQUE CELLULE TRUE OU FALSE GENERE GRACE A UN MATH.RANDOM() > 0.5
-    const randomCells = Array.from({ length: GRID_SIZE_X * GRID_SIZE_Y }, () => Math.random() > 0.5);
+function resetGrids() {
+    for (let row = 0; row < ROWS; row++) {
+        for (let col = 0; col < COLS; col++) {
+            GRID[row][col] = 0;
+            NEXT_GRID[row][col] = 0;
+        }
+    }
+}
 
-    const cells = document.querySelectorAll('.cell');
-    cells.forEach((cell, i) => {
-        const isAlive = randomCells[i];
-        cell.dataset.isAlive = isAlive ? "true" : "false";
+function copyAndResetGrid() {
+    for (let row = 0; row < ROWS; row++) {
+        for (let col = 0; col < COLS; col++) {
+            GRID[row][col] = NEXT_GRID[row][col];
+            NEXT_GRID[row][col] = 0;
+        }
+    }
+}
+
+// DRAW CELLS FUNCTIONS (MOUSE EVENTS)
+
+function cellMouseHoverHandler() {
+    if (mouse_down) {
+        const [row, col] = this.id.split('_');
+        const isAlive = this.getAttribute("status") === "alive";
+
+        GRID[row][col] = isAlive ? 0 : 1;
+        this.setAttribute("status", isAlive ? "dead" : "alive");
+    }
+}
+
+function mouseDownHandler(e) {
+    const target = e.target.closest(".cell");
+    if (target) {
+        const [row, col] = target.id.split('_');
+        const isAlive = target.getAttribute("status") === "alive";
+
+        GRID[row][col] = isAlive ? 0 : 1;
+        target.setAttribute("status", isAlive ? "dead" : "alive");
+    }
+    
+    mouse_down = true;
+}
+
+function mouseUpHandler() {
+    if (mouse_down) mouse_down = false;
+}
+
+// SETUP CONTROLS / BUTTONS, ADDEVENTLISTENERS
+
+function setupControls() {
+
+    // MOUSE DOWN/UP (DRAWING CELLS)
+    document.addEventListener('mousedown', mouseDownHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
+
+    // OVERLAY HIDE
+    const HIDE_BTN = document.getElementById('hide-btn');
+    const OVERLAY = document.getElementById('overlay');
+
+    HIDE_BTN.addEventListener('click', () => OVERLAY.classList.toggle('hide'));
+    document.addEventListener('keypress', (e) => {
+        if (e.key.toLowerCase() === "o") {
+            OVERLAY.classList.toggle('hide');
+        }
     });
 }
 
-function getAdjacentCells(cell_x, cell_y) { // RECUPERER TOUTES LES CELLULES ADJACENTES
-    const neighbors = [];
-    for (let y = -1; y <= 1; y++) {
-        for (let x = -1; x <= 1; x++) {
-            if (x === 0 && y === 0) {
-                continue;
-            }
-            const neighborX = parseInt(cell_x) + x;
-            const neighborY = parseInt(cell_y) + y;
-
-            if (neighborX < 1 || neighborY < 1 || neighborX > GRID_SIZE_X || neighborY > GRID_SIZE_Y) { // SI LE VOISIN EST HORS GRILLE
-                continue;
-            }
-
-            neighbors.push([neighborX, neighborY]);
-        }
-    }
-    return neighbors;
-}
-
-function updateCells() {
-    const cells = document.querySelectorAll('.cell');
-    const adjCells = {};
-    const cellsToUpdate = [];
-
-    for (let i = 0; i < cells.length; i++) {
-        const cell = cells[i];
-        const x = parseInt(cell.dataset.x, 10);
-        const y = parseInt(cell.dataset.y, 10);
-
-        if (!adjCells[x]) {
-            adjCells[x] = {};
-        }
-        if (!adjCells[x][y]) {
-            adjCells[x][y] = getAdjacentCells(x, y).map(coords => {
-                return {
-                    x: coords[0],
-                    y: coords[1],
-                    cell: getCell(coords[0], coords[1])
-                };
-            });
-        }
-
-        const adjCount = adjCells[x][y].reduce((count, adjCell) => {
-            return count + (adjCell.cell.dataset.isAlive === "true" ? 1 : 0);
-        }, 0);
-
-        const isAlive = cell.dataset.isAlive === "true";
-        if (isAlive) {
-            if (adjCount > 3 || adjCount < 2) {
-                cellsToUpdate.push(cell);
-            }
-        } else if (adjCount === 3) {
-            cellsToUpdate.push(cell);
-        }
-    }
-
-    for (let i = 0; i < cellsToUpdate.length; i++) {
-        cellsToUpdate[i].dataset.isAlive = cellsToUpdate[i].dataset.isAlive === "true" ? "false" : "true";
-    }
-
-    generation_count++;
-}
-
-
-
-
-// GAME INTERVAL | SPEED UPDATE
-
-let gameInterval;
-
-function updateInterval() {
-    clearInterval(gameInterval);
-    const v = (100 - parseInt(SPEED_RANGE.value)) * 7.5;
-
-    gameInterval = setInterval(() => {
-        if (is_running) {
-            updateCells();
-        }
-    }, v);
-}
-
-updateInterval();
-
-SPEED_RANGE.addEventListener('input', updateInterval);
-
-// BUTTONS EVENT LISTENER
-
-RESET_BTN.addEventListener('click', reset);
-START_BTN.addEventListener('click', startButton);
-RANDOM_BTN.addEventListener('click', randomGen);
-FORWARD_BTN.addEventListener('click', updateCells);
+init();

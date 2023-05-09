@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,28 +8,27 @@
     <title>Game Of Life</title>
     <link rel="stylesheet" href="assets/css/main.css">
 </head>
+
 <body>
-    <div id="zoom-btns">
-        <button id="zoom-in" class="button"> <img src="./assets/icons/zoom-in.svg" alt="Zoom in"></button>
-        <button id="zoom-out" class="button"> <img src="./assets/icons/zoom-out.svg" alt="Zoom out"></button>
-    </div>
-    <div id="game-of-life"></div>
+    <div id="container"></div>
 
     <div id="overlay">
         <div>
-            <button id="reset-btn" class="button"> <img src="./assets/icons/reset-icon.svg" alt="reset button"> </button>
-            <button id="start-pause-btn" class="button"> <img src="./assets/icons/play-icon.svg" alt="play button"> </button>
-            <button id="forward-btn" class="button"> <img src="./assets/icons/forward.svg" alt="forward button"></button>
-    
-            <input id="speed-range" type="range" min="0" max="100" value="20">
+            <button id="start-btn" title="Boutton START" class="circle-button"> <img src="./assets/icons/play-icon.svg"
+                    alt="play button"> </button>
+            <button id="forward-btn" title="Avance d'une generation" class="circle-button"> <img
+                    src="./assets/icons/forward.svg" alt="forward button"></button>
+
+            <input id="speed-range" title="Change la vitesse" type="range" min="0" max="100" value="75">
         </div>
-        <div class="gen">
-            <button id="random-btn">random</button>
+        <div class="buttons">
+            <button id="reset-btn" class="button" title="Remet à zéro la grille"> reset </button>
+            <button id="random-btn" title="Génère une grille aléatoire">random</button>
         </div>
-        <a id="hide-btn">Hide/Show <strong>[O]</strong></a>
+        <a id="hide-btn" title="Cache l'overlay (APPUIE SUR O POUR LE RE-AFFICHER)">Hide/Show <strong>[O]</strong></a>
     </div>
-    
-    <script src="assets/js/grid.js"></script>
+
     <script src="assets/js/game_of_life.js"></script>
 </body>
+
 </html>

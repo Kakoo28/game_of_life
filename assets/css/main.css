@@ -6,31 +6,170 @@
 body {
     font-family: sans-serif;
     margin: 0;
+    overflow: hidden;
 }
 
 #game-of-life {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    --scale: 1;
-    transform: scale(calc(var(--scale) - 0.5)) translate(-50%, -50%);
-    display: grid;
-    max-width: 100%;
-    max-height: 100vh;
+    border-spacing: 0;
+    overflow: hidden;
 }
 
 .cell {
-    width: 20px;
+    position: relative;
     height: 20px;
-    border: 1px solid grey;
+    width: 20px;
+    min-width: 20px;
+    min-height: 20px;
+    border: 1px solid lightgrey;
+    border-radius: 3px;
     cursor: pointer;
 }
 
-.cell[data-is-alive="true"] {
-    background-color: black;
-    border-color: black;
+.cell[status="alive"]::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(73, 145, 5, 0.8);
+    border-radius: 100%;
+
+}
+
+/* OVERLAY */
+
+#overlay.hide {
+    display: none;
+}
+#overlay {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    width: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+}
+
+#overlay>div:first-child {
+    width: 60%;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 10px;
+}
+
+.circle-button {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+    background-color: rgba(73, 145, 5, 0.8);
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+    margin-left: 10px;
+}
+
+#forward-btn>img {
+    width: 80%;
+    height: 80%;
+    margin-left: 5px;
+}
+#start-btn>img {
+    width: 60%;
+    height: 60;
+    margin-left: 5px;
+}
+
+.button:hover {
+    transform: scale(1.1);
+}
+
+#speed-range {
+    -webkit-appearance: none;
+    width: 50%;
+    max-width: 250px;
+    height: 10px;
+    background: #ddd;
+    border-radius: 5px;
+    outline: none;
+    transition: opacity 0.2s;
+    margin-left: 7.5%;
+}
+
+#speed-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: rgba(73, 145, 5, 0.8);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#speed-range::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: rgba(73, 145, 5, 0.8);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.buttons {
+    width: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    margin-bottom: 10px;
+    gap: 5%;
+}
+
+#random-btn,
+#reset-btn {
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 17px;
+    font-weight: bold;
+    color: #fff;
+    background-color: rgba(73, 145, 5, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+#random-btn:hover,
+#reset-btn:hover {
+    background-color: rgba(73, 145, 5, 0.7);
+    transform: scale(1.02);
+}
+
+#hide-btn {
+    position: absolute;
+    top: 2%;
+    right: 2%;
+    font-size: 14px;
+    text-decoration: none;
+    transition: transform 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+
+#hide-btn:hover {
+    transform: scale(1.05);
+    text-decoration: underline;
 }
 
 #zoom-btns {
@@ -43,145 +182,17 @@ body {
 }
 
 #zoom-btns .button {
-    background-color:rgba(73, 145, 5, 0.8);
-}
-
-#overlay {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    width: 60%;
-    transform: translateX(-50%);
-
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    
     background-color: rgba(73, 145, 5, 0.8);
-    border-radius: 10px;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
-
-    padding: 20px;
 }
 
-#overlay>div:first-child {
-    width: 60%;
 
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    
-    margin-bottom: 10px;
+@media screen and (max-width: 1000px) {
+    #overlay {
+        width: 100%;
+    }
 }
-
-.button {
-    width: 40px;
-    height: 40px;
-
-    display: flex;
-    justify-content: end;
-    align-items: center;
-
-    border: none;
-    border-radius: 50%;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
-    background-color: #fff;
-
-    cursor: pointer;
-    transition: transform 0.2s ease-in-out;
-
-    margin-left: 10px;
-}
-
-.button > img {
-    width: 90%;
-    height: 90%;
-}
-
-#reset-btn,
-#start-pause-btn.paused,
-#zoom-in,
-#zoom-out {
-    justify-content: center;
-}
-
-.button:hover {
-    transform: scale(1.1);
-}
-
-#reset-btn>img,
-#start-pause-btn>img,
-#forward-btn>img {
-    width: 80%;
-    height: 80%;
-}
-
-#speed-range {
-    -webkit-appearance: none;
-    width: 50%;
-    max-width: 250px;
-    height: 10px;
-    background: #ddd;
-    border-radius: 5px;
-    outline: none;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-}
-
-#speed-range::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    background: #5F5;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-#speed-range::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    background: #5F5;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.gen {
-    width: 35%;
-    margin-bottom: 10px;
-}
-
-#random-btn {
-    background-color: #fff;
-    border-radius: 5px;
-    padding: 10px 20px;
-    font-size: 17px;
-    font-weight: bold;
-    color: #333;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: background-color 0.2s ease-in-out;
-    cursor: pointer;
-    margin-left: auto;
-}
-
-#random-btn:hover {
-    background-color: #ddd;
-}
-
-#hide-btn {
-    position: absolute;
-    top: 2%;
-    right: 2%;
-    font-size: 14px;
-    color: #fff;
-    text-decoration: none;
-    transition: transform 0.2s ease-in-out;
-    cursor: pointer;
-}
-
-#hide-btn:hover {
-    transform: scale(1.05);
-    text-decoration: underline;
+@media screen and (max-width: 700px) {
+    #hide-btn {
+        display: none;
+    }
 }
