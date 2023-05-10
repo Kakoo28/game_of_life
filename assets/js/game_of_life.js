@@ -1,12 +1,15 @@
+// RECUPERATION DES ELEMENTS PRINCIPAUX DU DOM
 const GRID_CONTAINER = document.getElementById('container');
 const GENERATION_COUNT = document.getElementById('generation-count');
+const START_BTN = document.getElementById('start-btn');
+
+// VARIABLES GLOBALES
 
 const ROWS = Math.floor(window.innerHeight / 20);
 const COLS = Math.floor(window.innerWidth / 20);
 
 let GRID = new Array(ROWS);
 let NEXT_GRID = new Array(ROWS);
-
 
 let is_running = false;
 let mouse_down = false;
@@ -16,11 +19,12 @@ let generation = 0;
 let game_interval;
 let interval_time = 100;
 
+// FONCTION LERP (UTILE POUR LA BARRE DE VITESSE)
 function lerp(a, b, t) {
     return a * (1 - t) + b * t;
 }
 
-// INIT
+// FONCTION INIT
 function init() {
     drawGrid();
     initGrids();
@@ -28,7 +32,7 @@ function init() {
     setupControls();
 }
 
-// GAME FUNCTIONS 
+// FONCTIONS DU JEU
 
 function play() {
     gotoNextGeneration();
@@ -39,7 +43,6 @@ function play() {
         }, interval_time);
     }
 }
-
 function gotoNextGeneration() {
     for (let row = 0; row < ROWS; row++) {
         for (let col = 0; col < COLS; col++) {
@@ -80,7 +83,7 @@ function countAliveNeighbors(c_row, c_col) {
     return count;
 }
 
-// GRID FUNCTIONS 
+// FONCTIONS POUR LA GRILLE
 
 function drawGrid() {
     const table = document.createElement("table");
@@ -140,7 +143,7 @@ function updateGrid() {
     }
 }
 
-// BUTTON HANDLERS
+// GESTION DES BOUTONS
 
 function startButtonHandler() {
     const pause_icon = "./assets/icons/pause-icon.svg";
@@ -148,12 +151,12 @@ function startButtonHandler() {
     if (is_running) {
         is_running = false;
         this.children[0].src = play_icon;
-        this.classList.remove('paused');
+        this.classList.remove('pause');
         clearTimeout(game_interval);
     } else {
         is_running = true;
         this.children[0].src = pause_icon;
-        this.classList.add('paused');
+        this.classList.add('pause');
         play();
     }
 }
@@ -164,8 +167,8 @@ function resetButtonHandler() {
 
     GENERATION_COUNT.innerText = `GENERATION : 0`;
 
-    document.querySelector('#start-btn img').src = "./assets/icons/play-icon.svg";
-    document.querySelector('#start-btn').classList.remove('paused');
+    START_BTN.children[0].src = "./assets/icons/play-icon.svg";
+    START_BTN.classList.remove('pause');
     clearTimeout(game_interval);
 
     const aliveCells = document.querySelectorAll('.cell[status="alive"]');
@@ -193,7 +196,7 @@ function randomButtonHandler() {
 
 }
 
-// DRAW CELLS FUNCTIONS (MOUSE EVENTS)
+// FONCTIONS PERMETTANT DE DESSINER SUR LA GRILLE
 
 function cellMouseHoverHandler() {
     if (mouse_down) {
@@ -226,7 +229,6 @@ function mouseUpHandler() {
 
 function setupControls() {
     // BUTTONS
-    const START_BTN = document.getElementById('start-btn');
     START_BTN.addEventListener('click', startButtonHandler);
 
     const FORWARD_BTN = document.getElementById('forward-btn');
